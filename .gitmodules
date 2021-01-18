@@ -1,0 +1,6 @@
+[submodule "arti4docker"]
+	path = arti4docker
+	url = https://github.com/dac1997/arti4docker
+[submodule "lagosdocker"]
+	path = lagosdocker
+	url = https://github.com/dac1997/lagosdocker
