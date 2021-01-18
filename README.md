@@ -129,7 +129,15 @@ Indicamos donde se monta el volumen persistente, debe ser consistente
         
 Ahora que lo hemos entendido, podemos enviar el trabajo utilizando
 
-	argo submit testprotons.yaml
+	argo submit Simulation_yaml_Launchers/test\ yaml\ launchers/testprotons.yaml
+	
+	
+podemos chequear el progreso utilizando los siguientes comandos
+
+	argo list
+	argo get test-XXXXX
+	kubectl logs pod/test-XXXXX main
+	
 	
 ## Crear tu propio Contenedor con CORSIKA y ARTI
 
