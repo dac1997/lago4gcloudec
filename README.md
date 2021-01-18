@@ -71,16 +71,17 @@ Esta incluida el directorio 'Simulation_yaml_Launchers' que contiene los archivo
 
 Primero vamos a entender que hace el codigo, por ejemplo 'testprotons.yaml':
 
-#### el api de argo y el tipo de tarea que estamos realizando que es un Flujo de trabajo
+el api de argo y el tipo de tarea que estamos realizando que es un Flujo de trabajo
+
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 
-#### Generamos un nombre para nuestro pod a partir de test-. Es decir el nombre del pod y el workflow de argo sera test-XXXX
+Generamos un nombre para nuestro pod a partir de test-. Es decir el nombre del pod y el workflow de argo sera test-XXXX
 
 metadata:
   generateName: test-
  
-#### Especificamos los volumenes que se van a utilizar
+Especificamos los volumenes que se van a utilizar
   
 spec:
   entrypoint: test
@@ -89,7 +90,7 @@ spec:
     persistentVolumeClaim:
       claimName: nfs-1
     
-#### El template señala los contenedores que se van a utilizar  y los compando que se van a correr, el nombre de este template es test y la imagen que usamos proviene de mi DockerHub
+El template señala los contenedores que se van a utilizar  y los compando que se van a correr, el nombre de este template es test y la imagen que usamos proviene de mi DockerHub
 
   templates:
   - name: test
@@ -98,36 +99,28 @@ spec:
       command: [sh]
       source: |
       
-#### Ejecuta el comando del primer grupo de simulaciones
+Ejecuta el comando del primer grupo de simulaciones
         bash go-test-pr-1.sh 
-#### Dado que utiliza screen, chequeamos si hay screens siendo utilizadas, si aun estan, esperamos 
+	
+Dado que utiliza screen, chequeamos si hay screens siendo utilizadas, si aun estan, esperamos una hora. Las simulaciones de una hora de fluencia suelen tardar una buena cantidad de horas, esta de prueba va a demorar menos, entonces podria modificarse el tiempo de espera por conveniencia.
+
         while screen -list | grep -q "There are screens on"
         do
         sleep 3600
         screen -list 
         done 
         echo "First Ready"
+	
+Cuando esta listo, movemos los archivos resultantes a /mnt/vol/ que es donde esta montado nuestro volumen persistente. Liberando espacio en nuestro contenedor, evitando que luego el orquestrador de kubernetes nos expulse el pod
+
         mv  test/DAT* /mnt/vol/
-        bash go-test-pr-2.sh 
-        while screen -list | grep -q "There are screens on"
-        do
-        sleep 3600
-        screen -list 
-        done 
-        echo "Second Ready"
-        mv  test/DAT* /mnt/vol/
-	bash go-test-pr-3.sh 
-        while screen -list | grep -q "There are screens on"
-        do
-        sleep 3600
-        screen -list 
-        done 
-        echo "Third Ready Ready"
-        mv  test/DAT* /mnt/vol/
+	
+Mostramos los archivos que tenemos por el momento en el volumen
+
         echo ls -l /mnt/vol
         ls -l /mnt/vol
         
-####
+Indicamos donde se monta el volumen persistente, debe ser consistente
         
       volumeMounts:
       - name: task-pv-storage
