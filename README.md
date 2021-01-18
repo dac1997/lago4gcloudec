@@ -133,4 +133,34 @@ Ahora que lo hemos entendido, podemos enviar el trabajo utilizando
 	
 ## Crear tu propio Contenedor con CORSIKA y ARTI
 
-Es posible crear tu propia imagen para crear un contenedor listo para preparar tus simulaciones utilizando [ARTI](https://github.com/lagoproject/arti)
+Es posible crear tu propia imagen para crear un contenedor listo para preparar tus simulaciones utilizando el Dockerfile disponible en  el submodulo [lagosdocker](https://github.com/dac1997/lagosdocker/tree/master).  Para construir la imagen tal como esta (requiere la contraseña del repositorio de CORSIKA de LAGO) se utiliza:
+
+docker build --no-cache --build-arg PASS_FOR_LAGO_CORSIKA="AQUI LA CONTRASENA" -t lagoecuadorcloudsim https://github.com/dac1997/lagosdocker.git
+
+## Utilizando [ARTI](https://github.com/lagoproject/arti)
+
+Si ya tenemos instalado CORSIKA y ademas los archivos de configuracion de ARTI, se puede generar las simulaciones dentro del directorio de ARTI utilizando los scripts incluidos de la forma:
+
+	new_project.sh
+	
+	do_sims.sh
+	
+Al pasar las banderas correctas (Se puede consultar con la bandera -?), se obtiene un directorio con CORSIKA donde tenemos 'rain.pl' que organiza las simulaciones a partir de archivos de entrada ubicados en el subdirectorio del nombre que escogimos al utilizar do_sims. Ademas tenemos los escripts de bash 'go-nombre-XX-XX.sh' que seran los que lanzen las simulaciones.
+
+### Los Archivos go-
+
+En total se generan 15 archivos de la forma 'go-nombre-XX-XX.sh', los primeros ocho:
+
+	go-nombre-pr-X.sh
+
+Generan las simulaciones de entrada de protones como particulas primarias, dados que estos son la mayoria, se separan en 8 grupos diferentes, aun asi estas suelen ser las que más tiempo computacional toman. Luego:
+
+	go-nombre-all-XX.sh
+
+Generan las simulaciones de distintos tipos de partículas primarias de entrada, particularmente nucleos atómicos. Cada script go-all inicia la simulación de cuatro tipos de partículas. Estos conjuntos suelen ser los que menos recursos y tiempo ocupan. Finalmente:
+
+	go-nombre-he.sh
+	
+Que genera la simulacion de entrada de núcleos de helio. Estos suelen tardar un tiempo comparable al de un archivo go de protones.
+
+Estos scripts utilizan screen, cada archivo go toma 4 archivos de entrada y por lo tanto genera 4 simulaciones de CORSIKA en 4 screens
