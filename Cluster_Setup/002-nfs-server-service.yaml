@@ -1,0 +1,15 @@
+#Si se utilizo un nombre diferente para el servidor en '001-nfs-server.yaml', eso debe reflejarse aqui
+apiVersion: v1
+kind: Service
+metadata:
+  name: nfs-server-1
+spec:
+  ports:
+    - name: nfs
+      port: 2049
+    - name: mountd
+      port: 20048
+    - name: rpcbind
+      port: 111
+  selector:
+    role: nfs-server-1

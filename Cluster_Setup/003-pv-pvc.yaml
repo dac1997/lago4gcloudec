@@ -1,0 +1,28 @@
+#Si se cambia el tamaño del disco eso debe verse reflejado en las dos lineas de storage aqui
+#en server: incluir la direccion IP que se obtiene de 'kubectl get svc nfs-server-1'
+#Se puede cambiar el nombre del volumen persistente y del claim, pero esto debera reflejarse luego
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-1
+spec:
+  capacity:
+    storage: 300Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: XX.XX.XX.XX
+    path: "/"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nfs-1
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 300Gi
