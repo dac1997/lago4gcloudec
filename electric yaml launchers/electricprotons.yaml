@@ -1,0 +1,46 @@
+#electricprotons.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: electric-
+spec:
+  entrypoint: electric
+  volumes:
+  - name: task-pv-storage
+    persistentVolumeClaim:
+      claimName: nfs-1
+  templates:
+  - name: electric
+    script:
+      image: docker.io/dacb1997/tesisdeployers:electric
+      command: [sh]
+      source: |
+        bash go-electric-pr-1.sh 
+        while screen -list | grep -q "There are screens on"
+        do
+        sleep 3600
+        screen -list 
+        done 
+        echo "First Ready"
+        mv  electric/DAT* /mnt/vol/
+        bash go-electric-pr-2.sh 
+        while screen -list | grep -q "There are screens on"
+        do
+        sleep 3600
+        screen -list 
+        done 
+        echo "Second Ready"
+        mv  electric/DAT* /mnt/vol/
+	bash go-electric-pr-3.sh 
+        while screen -list | grep -q "There are screens on"
+        do
+        sleep 3600
+        screen -list 
+        done 
+        echo "Third Ready Ready"
+        mv  electric/DAT* /mnt/vol/
+        echo ls -l /mnt/vol
+        ls -l /mnt/vol
+      volumeMounts:
+      - name: task-pv-storage
+        mountPath: /mnt/vol

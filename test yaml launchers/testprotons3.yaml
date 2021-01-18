@@ -1,0 +1,47 @@
+#electricprotons.yaml
+#Launches Simulations for sets 7 and 8 for protons and helium nucleus
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: test-
+spec:
+  entrypoint: test
+  volumes:
+  - name: task-pv-storage
+    persistentVolumeClaim:
+      claimName: nfs-1
+  templates:
+  - name: test
+    script:
+      image: docker.io/dacb1997/tesisdeployers:test
+      command: [sh]
+      source: |
+        bash go-test-pr-7.sh 
+        while screen -list | grep -q "There are screens on"
+        do
+        sleep 3600
+        screen -list 
+        done 
+        echo "Seventh Ready"
+        mv  test/DAT* /mnt/vol/
+        bash go-test-pr-8.sh 
+        while screen -list | grep -q "There are screens on"
+        do
+        sleep 3600
+        screen -list 
+        done 
+        echo "Eigth Ready"
+        mv  test/DAT* /mnt/vol/
+	bash go-test-he.sh 
+        while screen -list | grep -q "There are screens on"
+        do
+        sleep 3600
+        screen -list 
+        done 
+        echo "Helium Ready"
+        mv  test/DAT* /mnt/vol/
+        echo ls -l /mnt/vol
+        ls -l /mnt/vol
+      volumeMounts:
+      - name: task-pv-storage
+        mountPath: /mnt/vol
